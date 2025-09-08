@@ -25,23 +25,26 @@ app.use(cookieParser());
 
 
 
+const cors = require("cors");
+
 const allowedOrigins = [
-  "http://localhost:5173",            // for local dev
-  "https://chatapp-tau-topaz.vercel.app" // your deployed frontend
+  "http://localhost:5173",
+  "https://chatapp-tau-topaz.vercel.app" // add your deployed frontend URL
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: function(origin, callback){
+    // allow requests with no origin (like mobile apps or curl)
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){
+      const msg = `The CORS policy for this site does not allow access from the specified Origin.`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true
+}));
+
 
 
 // Base route
@@ -55,10 +58,15 @@ app.use("/api/auth", authRoutes);
 // ----- SOCKET.IO SETUP -----
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
-    credentials: true,
-  },
+    origin: [
+      "http://localhost:5173",                   // for local dev
+      "https://chatapp-tau-topaz.vercel.app"    // deployed frontend
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
+  }
 });
+
 
 // Helper function: verify JWT
 const verifyToken = (token) => {
