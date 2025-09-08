@@ -167,11 +167,11 @@ const Chat = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 p-3 bg-gray-700 outline-none text-white placeholder-gray-400 rounded-lg"
+            className="flex-1 p-2 bg-gray-700 outline-none text-white placeholder-gray-400 rounded-lg"
           />
           <button
             onClick={sendMessage}
-            className="bg-blue-500 px-5 text-white font-bold hover:bg-blue-600 transition-colors rounded-lg"
+            className="bg-blue-500 px-5 py-2 text-white font-bold hover:bg-blue-600 transition-colors rounded-lg"
           >
             Send
           </button>
