@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+.roboto-flex {
+  font-family: "Roboto Flex", sans-serif;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-10%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: 200%; /* two sets side by side */
+  animation: marquee 10s linear infinite;
+}
+
+
+/* Hide scrollbar for Chrome, Safari, Edge */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE & Edge */
+}
+
+/* Add in index.css or globals.css */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
