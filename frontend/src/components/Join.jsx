@@ -38,7 +38,7 @@ const Join = () => {
     e.preventDefault();
 
     // 🔥 If auto mode is on → bypass validation
-    const loginEmail = autoLoginMode ? "testuser@example.com" : email;
+    const loginEmail = autoLoginMode ? "defaultuser@example.com" : email;
     const loginPassword = autoLoginMode ? "1@1BharD" : password;
 
     if (!autoLoginMode) {
