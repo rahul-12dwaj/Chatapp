@@ -22,12 +22,27 @@ const server = http.createServer(app);
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+
+
+
+const allowedOrigins = [
+  "http://localhost:5173",            // for local dev
+  "https://chatapp-tau-topaz.vercel.app" // your deployed frontend
+];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
 
 // Base route
 app.get("/", (req, res) => {
