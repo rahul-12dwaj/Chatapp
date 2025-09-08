@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Chat from "./components/Chat";
@@ -16,6 +16,7 @@ function App() {
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
+        <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Chat />} />
       </Route>
 
