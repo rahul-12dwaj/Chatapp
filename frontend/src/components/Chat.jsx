@@ -104,9 +104,9 @@ const Chat = () => {
   return (
     <div className="flex justify-center items-center h-screen text-gray-200 relative">
       <PlasmaBackground />
-      <div className="flex flex-col w-full max-w-md h-[100vh] shadow-xl overflow-hidden bg-gray-900">
+      <div className="flex flex-col w-full max-w-md h-[100vh] shadow-xl overflow-hidden">
         {/* Header */}
-        <div className="p-4 flex justify-between items-center bg-gradient-to-r from-purple-700 to-blue-600 text-white shadow-md rounded-b-xl">
+        <div className="p-4 flex justify-between items-center bg-gradient-to-r from-gray-900 to-blue-600 text-white shadow-md">
           <span className="font-semibold text-lg tracking-wide">{user?.name || "Anonymous"}</span>
           <button
             onClick={handleLogout}
