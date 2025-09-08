@@ -16,8 +16,10 @@ function App() {
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<Chat />} />
+        <Route path="/dashboard/*" element={<Chat />}>
+          {/* Default redirect to posts */}
+          <Route index element={<Navigate to="posts" replace />} />
+        </Route>
       </Route>
 
       {/* Fallback route */}
