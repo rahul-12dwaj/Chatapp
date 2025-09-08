@@ -102,8 +102,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen text-gray-200 relative">
-      <PlasmaBackground />
+    <div className="flex justify-center items-center bg-gray-900 h-screen text-gray-200 relative">
       <div className="flex flex-col w-full max-w-md h-[100vh] shadow-xl overflow-hidden">
         {/* Header */}
         <div className="p-4 flex justify-between items-center bg-gradient-to-r from-gray-900 to-blue-600 text-white shadow-md">
@@ -118,7 +117,7 @@ const Chat = () => {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 p-3 overflow-y-auto flex flex-col gap-3 relative scrollbar-hide">
+        <div className="flex-1 p-3 overflow-y-auto bg-gray-900 flex flex-col gap-3 relative scrollbar-hide">
           {messages.length === 0 && (
             <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-center text-gray-400 text-sm max-w-[80%] opacity-70">
               Start conversation by typing a message...

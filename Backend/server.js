@@ -25,8 +25,6 @@ app.use(cookieParser());
 
 
 
-const cors = require("cors");
-
 const allowedOrigins = [
   "http://localhost:5173",
   "https://chatapp-tau-topaz.vercel.app" // add your deployed frontend URL
