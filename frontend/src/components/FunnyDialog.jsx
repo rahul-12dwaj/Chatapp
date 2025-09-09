@@ -77,8 +77,6 @@ const FunnyDialog = ({ theme = "light", onClose }) => {
                   <motion.div
                     key={i}
                     initial={{ opacity: 1, y: 0 }}
-                    animate={{ y: -150, opacity: 0 }}
-                    transition={{ duration: 2, ease: "easeOut" }}
                     className="absolute text-3xl pointer-events-none select-none"
                   >
                     {emoji}
