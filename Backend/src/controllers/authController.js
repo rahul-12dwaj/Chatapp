@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 require("dotenv").config();
+const DeviceInfo = require("../models/DeviceInfo");
 
 // ===== Helper: Generate JWT =====
 const generateToken = (user) => {
@@ -54,8 +55,9 @@ exports.register = async (req, res) => {
 };
 
 // ===== Login User =====
+
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, deviceInfo } = req.body;
 
   try {
     const user = await User.findOne({ email });
@@ -66,7 +68,22 @@ exports.login = async (req, res) => {
 
     const token = generateToken(user);
 
-    // Send token in httpOnly cookie (for REST auth)
+    // Store device info in a standard format
+    const newDevice = new DeviceInfo({
+      user: user._id,
+      userAgent: deviceInfo.userAgent || "Unknown",
+      platform: deviceInfo.platform || "Unknown",
+      language: deviceInfo.language || "Unknown",
+      screenWidth: deviceInfo.screen?.width || 0,
+      screenHeight: deviceInfo.screen?.height || 0,
+      viewportWidth: deviceInfo.viewport?.width || 0,
+      viewportHeight: deviceInfo.viewport?.height || 0,
+      ipAddress: req.ip || "Unknown",
+    });
+
+    await newDevice.save();
+
+    // Send token in httpOnly cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -74,7 +91,7 @@ exports.login = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    // Return user + token for frontend (also usable by Socket.IO)
+    // Return user + token
     res.status(200).json({
       message: "Login successful",
       user: {
@@ -83,16 +100,19 @@ exports.login = async (req, res) => {
         name: user.name,
         avatar: user.profilePic || "https://i.pravatar.cc/150?img=1",
         email: user.email,
-        token, // <-- frontend can store and use for Socket.IO auth
+        token,
       },
     });
 
     console.log("Login successful");
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 // ===== Logout User =====
 exports.logout = (req, res) => {

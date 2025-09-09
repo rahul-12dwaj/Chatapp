@@ -79,33 +79,25 @@ const verifyToken = (token) => {
 io.on("connection", async (socket) => {
   console.log("New client connected:", socket.id);
 
-  // Authenticate user
+  // Authenticate
   const { token } = socket.handshake.auth;
   const user = verifyToken(token);
-
-  if (!user) {
-    console.log("Unauthorized socket connection. Disconnecting...");
-    socket.disconnect();
-    return;
-  }
-
+  if (!user) return socket.disconnect();
   socket.user = user;
 
-  // Send existing chat history from DB
+  // Send chat history
   try {
     const messages = await Message.find().sort({ timestamp: 1 }).lean();
     socket.emit("chat history", messages);
   } catch (err) {
-    console.error("Error fetching chat history:", err);
+    console.error(err);
   }
 
   // Listen for new messages
   socket.on("chat message", async (msg) => {
-  try {
     if (!msg.content) return;
-
     const newMsg = new Message({
-      message_id: msg.id,   // ✅ map frontend id -> message_id
+      message_id: msg.id, // frontend id
       sender: socket.user.id,
       senderName: socket.user.name || "Anonymous",
       content: msg.content,
@@ -114,32 +106,27 @@ io.on("connection", async (socket) => {
 
     await newMsg.save();
 
-    // 🔥 Emit plain object instead of Mongoose doc
     io.emit("chat message", {
-      id: newMsg._id.toString(), // always emit as id
+      id: newMsg._id.toString(),
       message_id: newMsg.message_id,
       sender: newMsg.sender,
       senderName: newMsg.senderName,
       content: newMsg.content,
       timestamp: newMsg.timestamp,
+      seen: false,
     });
-
-  } catch (err) {
-    console.error("Error saving chat message:", err);
-  }
-});
-
-
+  });
 
   // Typing indicator
   socket.on("typing", (data) => {
-    socket.broadcast.emit("typing", data); // send to others only
+    socket.broadcast.emit("typing", data);
   });
 
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
   });
 });
+
 
 // Start server
 const PORT = process.env.PORT || 3000;

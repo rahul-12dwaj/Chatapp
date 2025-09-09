@@ -31,6 +31,31 @@ const Join = () => {
     return () => clearTimeout(timer);
   }, [toast]);
 
+
+
+  // get device information
+
+  const getDeviceInfo = () => {
+  return {
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    language: navigator.language,
+    // screen size
+    screen: {
+      width: window.screen.width,
+      height: window.screen.height,
+    },
+    // browser viewport
+    viewport: {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    },
+    // timestamp
+    loginTime: new Date().toISOString(),
+  };
+};
+
+
   // -------------------------------
   // Submit Handler
   // -------------------------------
@@ -46,12 +71,14 @@ const Join = () => {
       if (!loginPassword) return setPasswordError("Password is required");
     }
 
+    const deviceInfo = getDeviceInfo();
+
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
       const res = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+        body: JSON.stringify({ email: loginEmail, password: loginPassword, deviceInfo}),
         credentials: "include",
       });
 

@@ -8,8 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { FiLogOut, FiSmile, FiMoon, FiSun } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 import EmojiPicker from "emoji-picker-react";
-
-// ✅ Import your FunnyDialog component
 import FunnyDialog from "./FunnyDialog";
 
 const Chat = () => {
@@ -22,31 +20,30 @@ const Chat = () => {
   const [typingUsers, setTypingUsers] = useState([]);
   const [showEmoji, setShowEmoji] = useState(false);
   const [theme, setTheme] = useState("light");
-  const [showDialog, setShowDialog] = useState(false); // ✅ state for dialog
+  const [showDialog, setShowDialog] = useState(false);
 
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
   const typingTimeouts = useRef({});
   const emojiRef = useRef(null);
 
-  // Auto scroll
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-
-
-  // Setup socket
+  // ---- Socket setup ----
   useEffect(() => {
     const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
     socketRef.current = io(API_URL, {
       withCredentials: true,
       auth: { token: user?.token || null },
     });
+
     const socket = socketRef.current;
 
     socket.on("connect", () => console.log("Socket connected:", socket.id));
 
+    // Chat history
     socket.on("chat history", (history) => {
       const uniqueHistory = history.filter(
         (msg, index, self) => index === self.findIndex((m) => m._id === msg._id)
@@ -54,6 +51,7 @@ const Chat = () => {
       setMessages(uniqueHistory);
     });
 
+    // New message
     socket.on("chat message", (msg) => {
       setMessages((prev) => {
         if (prev.find((m) => m.id === msg.id)) return prev;
@@ -61,7 +59,8 @@ const Chat = () => {
       });
     });
 
-    socket.on("typing", ({ userId, name }) => {
+    // Typing indicator
+    socket.on("typing", ({ name }) => {
       setTypingUsers((prev) => (prev.includes(name) ? prev : [...prev, name]));
       if (typingTimeouts.current[name]) clearTimeout(typingTimeouts.current[name]);
       typingTimeouts.current[name] = setTimeout(() => {
@@ -69,38 +68,33 @@ const Chat = () => {
       }, 2000);
     });
 
-    socket.on("connect_error", (err) => console.error("Socket error:", err));
-
     return () => {
       socket.disconnect();
-      socket.off();
     };
   }, [user]);
 
+  // Scroll to bottom whenever messages or typing users change
   useEffect(() => scrollToBottom(), [messages, typingUsers, scrollToBottom]);
 
+  // ---- Send message ----
   const sendMessage = () => {
     const text = input.trim();
     if (!text) return;
+
     const msgObj = {
       id: uuidv4(),
       sender: user.id,
-      senderName: user.name,
       content: text,
       timestamp: new Date().toISOString(),
     };
+
     socketRef.current.emit("chat message", msgObj);
     setInput("");
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") sendMessage();
-    else {
-      socketRef.current.emit("typing", {
-        userId: user?.id || "anon",
-        name: user?.name || "Anonymous",
-      });
-    }
+    else socketRef.current.emit("typing", { name: user?.name || "Anonymous" });
   };
 
   const handleLogout = () => {
@@ -113,7 +107,7 @@ const Chat = () => {
     setInput((prev) => prev + emojiData.emoji);
   };
 
-  // Theme styles
+  // ---- Theme styles ----
   const themes = {
     light: {
       container: "bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 text-gray-800",
@@ -137,20 +131,16 @@ const Chat = () => {
 
   const t = themes[theme];
 
-  // click outside for emoji picker
+  // ---- Click outside for emoji picker ----
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (emojiRef.current && !emojiRef.current.contains(e.target)) {
         setShowEmoji(false);
       }
     };
-    if (showEmoji) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showEmoji]);
+  }, []);
 
   return (
     <div className={`flex justify-center items-center h-screen relative ${t.container}`}>
@@ -158,7 +148,7 @@ const Chat = () => {
         {/* Header */}
         <div className={`p-4 flex justify-between items-center shadow-lg ${t.header}`}>
           <span
-            onClick={() => setShowDialog(true)} // ✅ Open FunnyDialog on avatar click
+            onClick={() => setShowDialog(true)}
             className="font-bold text-xl tracking-wide drop-shadow-lg flex items-center gap-2 cursor-pointer"
           >
             <img
@@ -169,7 +159,6 @@ const Chat = () => {
           </span>
 
           <div className="flex items-center gap-3 relative">
-            {/* Theme Toggle Icon */}
             <motion.button
               whileTap={{ scale: 0.8 }}
               onClick={() => setTheme(theme === "light" ? "dark" : "light")}
@@ -214,16 +203,10 @@ const Chat = () => {
           </div>
         </div>
 
-        {/* ✅ FunnyDialog appears here */}
+        {/* FunnyDialog */}
         <AnimatePresence>
-        {showDialog && (
-          <FunnyDialog
-            theme={theme}          // Pass the current theme
-            onClose={() => setShowDialog(false)}
-          />
-        )}
-      </AnimatePresence>
-
+          {showDialog && <FunnyDialog theme={theme} onClose={() => setShowDialog(false)} />}
+        </AnimatePresence>
 
         {/* Messages */}
         <div className={`flex-1 p-4 overflow-y-auto flex flex-col gap-4 relative scrollbar-hide ${t.messages}`}>
@@ -235,21 +218,20 @@ const Chat = () => {
 
           {messages.map((msg) => (
             <motion.div
-              key={msg._id || msg.id}
+              key={msg.id || msg._id}
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ type: "spring", stiffness: 100, damping: 12 }}
               className={`max-w-[70%] px-4 py-3 rounded-2xl text-sm break-words shadow-md relative ${
-                msg.sender === (user?.id || "anon")
+                msg.sender === user.id
                   ? `self-end ${t.bubbleSelf} rounded-br-sm`
                   : msg.sender === "astro"
                   ? `self-start ${t.bubbleAstro} rounded-bl-sm`
                   : `self-start ${t.bubbleOther} rounded-bl-sm`
               }`}
             >
-              {/* Removed senderName display */}
               {msg.content}
-              <div className="text-[10px] text-white/70 text-right mt-1">
+              <div className="text-[10px] text-white/70 text-right mt-1 flex justify-end items-center gap-1">
                 {dayjs(msg.timestamp).format("HH:mm")}
               </div>
             </motion.div>
@@ -268,7 +250,6 @@ const Chat = () => {
 
           <div ref={messagesEndRef} />
         </div>
-
 
         {/* Input */}
         <div className={`flex items-center border-t border-gray-300 p-3 gap-2 relative ${t.inputBar}`}>
