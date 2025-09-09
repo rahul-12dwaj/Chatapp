@@ -97,7 +97,7 @@ const FunnyDialog = ({ theme = "light", onClose }) => {
           </button>
 
           <p className="text-lg font-semibold mb-6">
-            It was a stupid IDEA
+            Stupid Idea
           </p>
 
           <div className="flex justify-center gap-6 relative">
