@@ -115,9 +115,9 @@ const Chat = () => {
       container: "bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 text-gray-800",
       header: "bg-gradient-to-r from-pink-500 to-purple-600 text-white",
       messages: "bg-white/70",
-      inputBar: "bg-gradient-to-r from-pink-300 to-purple-200",
+      inputBar: "bg-white/70",
       bubbleSelf: "bg-gradient-to-r from-pink-500 to-red-400 text-white",
-      bubbleOther: "bg-gradient-to-r from-blue-400 to-cyan-400 text-white",
+      bubbleOther: "bg-gradient-to-r from-blue-700 to-cyan-600 text-white",
       bubbleAstro: "bg-gradient-to-r from-purple-500 to-indigo-400 text-white",
     },
     dark: {
@@ -148,7 +148,7 @@ const Chat = () => {
     <div className={`flex justify-center items-center h-screen relative ${t.container}`}>
       <div className="flex flex-col w-full h-full shadow-2xl overflow-hidden backdrop-blur-lg">
         {/* Header */}
-        <div className={`p-4 flex justify-between items-center shadow-lg ${t.header}`}>
+        <div className={`p-3 flex justify-between items-center shadow-lg ${t.header}`}>
           <span
             onClick={() => setShowDialog(true)}
             className="font-bold text-xl tracking-wide drop-shadow-lg flex items-center gap-2 cursor-pointer"
@@ -279,7 +279,7 @@ const Chat = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 p-2 bg-white/70 outline-none text-gray-700 placeholder-gray-400 rounded-xl shadow-inner"
+            className="flex-1 p-2 bg-white/70 outline-none text-gray-700 placeholder-gray-600 border border-gray-300 rounded-xl shadow-inner"
           />
           <motion.button
             whileTap={{ scale: 0.9 }}
