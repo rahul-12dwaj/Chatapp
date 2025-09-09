@@ -19,6 +19,9 @@ const Join = () => {
   const [passwordError, setPasswordError] = useState("");
   const [toast, setToast] = useState({ message: "", type: "" });
 
+  // ⏳ Loader state
+  const [loading, setLoading] = useState(false);
+
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
@@ -31,44 +34,45 @@ const Join = () => {
     return () => clearTimeout(timer);
   }, [toast]);
 
-
-
-  // get device information
-
+  // -------------------------------
+  // Device Information
+  // -------------------------------
   const getDeviceInfo = () => {
-  return {
-    userAgent: navigator.userAgent,
-    platform: navigator.platform,
-    language: navigator.language,
-    // screen size
-    screen: {
-      width: window.screen.width,
-      height: window.screen.height,
-    },
-    // browser viewport
-    viewport: {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    },
-    // timestamp
-    loginTime: new Date().toISOString(),
+    return {
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language,
+      screen: {
+        width: window.screen.width,
+        height: window.screen.height,
+      },
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      },
+      loginTime: new Date().toISOString(),
+    };
   };
-};
-
 
   // -------------------------------
   // Submit Handler
   // -------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    // 🔥 If auto mode is on → bypass validation
     const loginEmail = autoLoginMode ? "defaultuser@example.com" : email;
     const loginPassword = autoLoginMode ? "1@1BharD" : password;
 
     if (!autoLoginMode) {
-      if (!loginEmail) return setEmailError("Email is required");
-      if (!loginPassword) return setPasswordError("Password is required");
+      if (!loginEmail) {
+        setLoading(false);
+        return setEmailError("Email is required");
+      }
+      if (!loginPassword) {
+        setLoading(false);
+        return setPasswordError("Password is required");
+      }
     }
 
     const deviceInfo = getDeviceInfo();
@@ -78,7 +82,7 @@ const Join = () => {
       const res = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: loginEmail, password: loginPassword, deviceInfo}),
+        body: JSON.stringify({ email: loginEmail, password: loginPassword, deviceInfo }),
         credentials: "include",
       });
 
@@ -86,10 +90,10 @@ const Join = () => {
       console.log("Login API Response:", data);
 
       if (!res.ok) {
+        setLoading(false);
         return setToast({ message: data.message || "Invalid credentials", type: "error" });
       }
 
-      // Success: update Redux
       dispatch(setUser({
         id: data.user.id,
         name: data.user.name,
@@ -99,17 +103,19 @@ const Join = () => {
         token: data.user.token,
       }));
 
-      // Save token in localStorage
       localStorage.setItem("token", data.user.token);
 
       setToast({ message: "Login Successful!", type: "success" });
 
-      // Navigate to dashboard
-      setTimeout(() => navigate("/dashboard"), 200);
+      setTimeout(() => {
+        setLoading(false);
+        navigate("/dashboard");
+      }, 300);
 
     } catch (err) {
       console.error("Network Error:", err);
       setToast({ message: "Network Error", type: "error" });
+      setLoading(false);
     }
   };
 
@@ -139,7 +145,7 @@ const Join = () => {
       {/* Login Form */}
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-xl shadow-lg px-6 py-8 flex flex-col gap-5"
+        className="w-full max-w-md rounded-xl shadow-lg px-6 py-8 flex flex-col gap-5 bg-black/30 backdrop-blur-sm"
       >
         <div className="flex flex-col items-center text-center gap-2">
           <p className="text-xl font-bold text-white">
@@ -152,7 +158,6 @@ const Join = () => {
           </span>
         </div>
 
-        {/* Only show fields if Manual login */}
         {!autoLoginMode && (
           <>
             {/* Email Field */}
@@ -170,6 +175,7 @@ const Join = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="example@gmail.com"
                   className="w-full h-11 pl-10 pr-3 rounded-md border bg-black/20 text-sm border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  disabled={loading}
                 />
               </div>
               {emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
@@ -190,6 +196,7 @@ const Join = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
                   className="w-full h-11 pl-10 pr-3 rounded-md border bg-black/20 text-sm border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  disabled={loading}
                 />
               </div>
               {passwordError && <p className="text-red-500 text-xs mt-1">{passwordError}</p>}
@@ -200,9 +207,20 @@ const Join = () => {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full h-11 flex items-center justify-center rounded-md font-semibold transition bg-blue-600 hover:bg-blue-400 text-white"
+          disabled={loading}
+          className={`w-full h-11 flex items-center justify-center rounded-md font-semibold transition text-white ${
+            loading
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-400"
+          }`}
         >
-          {autoLoginMode ? "Let's Chat 🚀" : "Sign In"}
+          {loading ? (
+            <motion.div
+              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+            />
+          ) : (
+            autoLoginMode ? "Let's Chat 🚀" : "Sign In"
+          )}
         </button>
       </form>
 
