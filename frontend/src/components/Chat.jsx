@@ -158,6 +158,10 @@ const Chat = () => {
               alt="User Avatar"
               className="w-8 h-8 rounded-full border-2 border-white shadow-md"
             />
+            <div className="flex flex-col">
+              <p className="text-xs">view profile</p>
+              <p className="text-xs text-blue-300">Click Here</p>
+            </div>
           </span>
 
           <div className="flex items-center gap-3 relative">
