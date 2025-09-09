@@ -13,7 +13,7 @@ const FunnyDialog = ({ theme = "light", onClose }) => {
 
   const audioRef = useRef(null);
 
-  const message = `Tum bohot pyaari ho, or tumhari smile or bhi jyada pyaari hai, or upasana naam achha hai but kitty bolne m kitna pyaara hai 🤍🌷, I wish tumhare sapne pure ho jaayein!!`;
+  const message = `Tum bohot pyaari ho 🤍🌷, I wish tumhare sapne pure ho jaayein Kitty!!`;
 
   // Theme styles
   const themes = {
