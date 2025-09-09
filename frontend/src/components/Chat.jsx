@@ -247,11 +247,7 @@ const Chat = () => {
                   : `self-start ${t.bubbleOther} rounded-bl-sm`
               }`}
             >
-              {msg.senderName && (
-                <span className="block font-semibold text-xs mb-1 opacity-80">
-                  {msg.senderName}
-                </span>
-              )}
+              {/* Removed senderName display */}
               {msg.content}
               <div className="text-[10px] text-white/70 text-right mt-1">
                 {dayjs(msg.timestamp).format("HH:mm")}
@@ -272,6 +268,7 @@ const Chat = () => {
 
           <div ref={messagesEndRef} />
         </div>
+
 
         {/* Input */}
         <div className={`flex items-center border-t border-gray-300 p-3 gap-2 relative ${t.inputBar}`}>
