@@ -8,7 +8,7 @@ const FunnyDialog = ({ theme = "light", onClose }) => {
   const [showCelebration, setShowCelebration] = useState(false);
 
   const audioRef = useRef(null);
-  const message = `I wish tumhare sapne pure ho jaayein!!`;
+  const message = `I wish tumhare sapne pure ho jaayein 🤍🍁!!`;
 
   // Theme styles
   const themes = {
