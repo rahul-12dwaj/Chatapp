@@ -21,6 +21,7 @@ const Chat = () => {
   const [showEmoji, setShowEmoji] = useState(false);
   const [theme, setTheme] = useState("light");
   const [showDialog, setShowDialog] = useState(false);
+  const [loading, setLoading] = useState(true); // ✅ skeleton loading state
 
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
@@ -49,6 +50,7 @@ const Chat = () => {
         (msg, index, self) => index === self.findIndex((m) => m._id === msg._id)
       );
       setMessages(uniqueHistory);
+      setLoading(false); // ✅ stop skeleton
     });
 
     // New message
@@ -113,7 +115,7 @@ const Chat = () => {
       container: "bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 text-gray-800",
       header: "bg-gradient-to-r from-pink-500 to-purple-600 text-white",
       messages: "bg-white/70",
-      inputBar: "bg-gradient-to-r from-pink-100 to-purple-100",
+      inputBar: "bg-gradient-to-r from-pink-300 to-purple-200",
       bubbleSelf: "bg-gradient-to-r from-pink-500 to-red-400 text-white",
       bubbleOther: "bg-gradient-to-r from-blue-400 to-cyan-400 text-white",
       bubbleAstro: "bg-gradient-to-r from-purple-500 to-indigo-400 text-white",
@@ -210,34 +212,46 @@ const Chat = () => {
 
         {/* Messages */}
         <div className={`flex-1 p-4 overflow-y-auto flex flex-col gap-4 relative scrollbar-hide ${t.messages}`}>
-          {messages.length === 0 && (
+          {loading ? (
+            // ✅ Skeleton loader
+            <div className="flex flex-col gap-3 animate-pulse">
+              {[...Array(6)].map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-6 w-${i % 2 === 0 ? "2/3 self-start" : "2/3 self-end"} rounded-xl ${
+                    theme === "light" ? "bg-gray-300" : "bg-gray-700"
+                  }`}
+                />
+              ))}
+            </div>
+          ) : messages.length === 0 ? (
             <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 text-center text-gray-500 text-sm max-w-[80%] opacity-80">
               Send a message and let the story begin...
             </div>
+          ) : (
+            messages.map((msg) => (
+              <motion.div
+                key={msg.id || msg._id}
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 100, damping: 12 }}
+                className={`max-w-[70%] px-4 py-3 rounded-2xl text-sm break-words shadow-md relative ${
+                  msg.sender === user.id
+                    ? `self-end ${t.bubbleSelf} rounded-br-sm`
+                    : msg.sender === "astro"
+                    ? `self-start ${t.bubbleAstro} rounded-bl-sm`
+                    : `self-start ${t.bubbleOther} rounded-bl-sm`
+                }`}
+              >
+                {msg.content}
+                <div className="text-[10px] text-white/70 text-right mt-1 flex justify-end items-center gap-1">
+                  {dayjs(msg.timestamp).format("HH:mm")}
+                </div>
+              </motion.div>
+            ))
           )}
 
-          {messages.map((msg) => (
-            <motion.div
-              key={msg.id || msg._id}
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ type: "spring", stiffness: 100, damping: 12 }}
-              className={`max-w-[70%] px-4 py-3 rounded-2xl text-sm break-words shadow-md relative ${
-                msg.sender === user.id
-                  ? `self-end ${t.bubbleSelf} rounded-br-sm`
-                  : msg.sender === "astro"
-                  ? `self-start ${t.bubbleAstro} rounded-bl-sm`
-                  : `self-start ${t.bubbleOther} rounded-bl-sm`
-              }`}
-            >
-              {msg.content}
-              <div className="text-[10px] text-white/70 text-right mt-1 flex justify-end items-center gap-1">
-                {dayjs(msg.timestamp).format("HH:mm")}
-              </div>
-            </motion.div>
-          ))}
-
-          {typingUsers.length > 0 && (
+          {typingUsers.length > 0 && !loading && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -252,7 +266,7 @@ const Chat = () => {
         </div>
 
         {/* Input */}
-        <div className={`flex items-center border-t border-gray-300 p-3 gap-2 relative ${t.inputBar}`}>
+        <div className={`flex items-center p-3 gap-2 relative ${t.inputBar}`}>
           <button
             onClick={() => setShowEmoji((prev) => !prev)}
             className="text-2xl text-pink-500 hover:scale-110 transition-transform"

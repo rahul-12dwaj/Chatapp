@@ -52,7 +52,7 @@ const FunnyDialog = ({ theme = "light", onClose }) => {
     setStrikeNo(true);
     setTypedText(""); // reset typing
 
-    setTimeout(() => setShowCelebration(false), 3000);
+    setShowCelebration(true);
   };
 
   // Auto-play audio
@@ -76,7 +76,7 @@ const FunnyDialog = ({ theme = "light", onClose }) => {
     return () => clearInterval(interval);
   }, [showAudio, message]);
 
-  const emojis = ["💖", "❤️", "🌸", "❤️", "❤️", "❤️","💖", "❤️", "🌸", "❤️", "❤️", "❤️"];
+  const emojis = ["❤️"];
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
@@ -141,15 +141,10 @@ const FunnyDialog = ({ theme = "light", onClose }) => {
                   <motion.div
                     key={i}
                     initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-                    animate={{
-                      opacity: 0,
-                      x: randomX,
-                      y: randomY,
-                      scale: Math.random() * 1.5 + 0.5,
-                    }}
+                  
                     transition={{ duration }}
                     className="absolute text-3xl pointer-events-none select-none"
-                    style={{ left: "50%", top: "70%" }}
+             
                   >
                     {emoji}
                   </motion.div>
@@ -160,7 +155,7 @@ const FunnyDialog = ({ theme = "light", onClose }) => {
           {/* Audio player */}
           {showAudio && (
             <div
-              className={`mt-4 p-2 rounded-xl shadow-lg flex flex-col justify-center items-center ${t.audioBg}`}
+              className={`mt-4 p-1 rounded-4xl shadow-lg flex flex-col justify-center items-center ${t.audioBg}`}
             >
               <audio
                 ref={audioRef}
