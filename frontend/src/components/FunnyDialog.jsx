@@ -76,7 +76,7 @@ const FunnyDialog = ({ theme = "light", onClose }) => {
     return () => clearInterval(interval);
   }, [showAudio, message]);
 
-  const emojis = ["💖", "❤️", "🌸", "🌹", "💐", "🥰"];
+  const emojis = ["💖", "❤️", "🌸", "❤️", "❤️", "❤️","💖", "❤️", "🌸", "❤️", "❤️", "❤️"];
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
