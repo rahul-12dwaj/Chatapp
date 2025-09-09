@@ -97,7 +97,7 @@ const FunnyDialog = ({ theme = "light", onClose }) => {
           </button>
 
           <p className="text-lg font-semibold mb-6">
-            Mere baare mein jaan’na hai to pehle dost banna padega
+            Meri Profile dekhni hai to pehle dost banna padega
           </p>
 
           <div className="flex justify-center gap-6 relative">
