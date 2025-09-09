@@ -25,23 +25,21 @@ app.use(cookieParser());
 
 
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://chatapp-tau-topaz.vercel.app" // add your deployed frontend URL
-];
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "https://chatapp-tau-topaz.vercel.app",
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
 
-app.use(cors({
-  origin: function(origin, callback){
-    // allow requests with no origin (like mobile apps or curl)
-    if(!origin) return callback(null, true);
-    if(allowedOrigins.indexOf(origin) === -1){
-      const msg = `The CORS policy for this site does not allow access from the specified Origin.`;
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true
-}));
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options("*", cors(corsOptions));
+
 
 
 
